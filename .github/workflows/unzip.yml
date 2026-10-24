@@ -10,14 +10,30 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-      - name: Ekstrak dan Hapus ZIP
+      - name: Ekstrak dan Pindahkan ke Root
         run: |
-          unzip -o *.zip -d .
+          # Aktifkan pembacaan file tersembunyi (seperti .gitignore)
+          shopt -s dotglob
+          
+          # Ekstrak ke folder sementara
+          unzip -o *.zip -d temp_extract
           rm *.zip
-      - name: Simpan Hasil Ekstrak
+          
+          # Cek jika isi ZIP cuma 1 folder utama, pindahkan isinya ke root
+          if [ $(ls -1 temp_extract | wc -l) -eq 1 ] && [ -d "temp_extract/$(ls -1 temp_extract)" ]; then
+            FOLDER_NAME=$(ls -1 temp_extract)
+            mv temp_extract/"$FOLDER_NAME"/* ./
+          else
+            # Jika file langsung berjejer tanpa folder pembungkus
+            mv temp_extract/* ./
+          fi
+          
+          # Bersihkan folder sementara
+          rm -rf temp_extract
+      - name: Simpan Hasil
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Auto extract ZIP via Actions"
+          git commit -m "Auto extract ZIP ke root via Actions"
           git push
