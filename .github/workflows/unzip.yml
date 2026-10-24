@@ -8,27 +8,22 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      workflows: write
     steps:
       - uses: actions/checkout@v3
       - name: Ekstrak dan Pindahkan ke Root
         run: |
-          # Aktifkan pembacaan file tersembunyi (seperti .gitignore)
-          shopt -s dotglob
-          
-          # Ekstrak ke folder sementara
           unzip -o *.zip -d temp_extract
           rm *.zip
           
-          # Cek jika isi ZIP cuma 1 folder utama, pindahkan isinya ke root
-          if [ $(ls -1 temp_extract | wc -l) -eq 1 ] && [ -d "temp_extract/$(ls -1 temp_extract)" ]; then
+          # Cek folder utama dan salin isi file agar bisa merge otomatis
+          if [ $(ls -1 temp_extract | wc -l) -eq 1 ]; then
             FOLDER_NAME=$(ls -1 temp_extract)
-            mv temp_extract/"$FOLDER_NAME"/* ./
+            cp -a temp_extract/"$FOLDER_NAME"/. ./
           else
-            # Jika file langsung berjejer tanpa folder pembungkus
-            mv temp_extract/* ./
+            cp -a temp_extract/. ./
           fi
           
-          # Bersihkan folder sementara
           rm -rf temp_extract
       - name: Simpan Hasil
         run: |
