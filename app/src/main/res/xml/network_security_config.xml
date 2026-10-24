@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Ini akan mengizinkan aplikasi Anda mengakses link http:// dari panel Pterodactyl -->
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>
