@@ -8,7 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      workflows: write
     steps:
       - uses: actions/checkout@v3
       - name: Ekstrak dan Pindahkan ke Root
@@ -16,11 +15,13 @@ jobs:
           unzip -o *.zip -d temp_extract
           rm *.zip
           
-          # Cek folder utama dan salin isi file agar bisa merge otomatis
+          # Cek folder utama, hapus .github bawaan dari ZIP agar tidak bentrok, lalu pindahkan
           if [ $(ls -1 temp_extract | wc -l) -eq 1 ]; then
             FOLDER_NAME=$(ls -1 temp_extract)
+            rm -rf temp_extract/"$FOLDER_NAME"/.github
             cp -a temp_extract/"$FOLDER_NAME"/. ./
           else
+            rm -rf temp_extract/.github
             cp -a temp_extract/. ./
           fi
           
